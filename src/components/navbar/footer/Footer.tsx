@@ -11,15 +11,20 @@ function Footer() {
           <p className='text-xl font-bold'>
             Blog Pessoal Rayane Nogueira | Copyright: {data}
           </p>
-
           <p className='text-lg'>Acesse nossas redes sociais</p>
-
           <div className='flex gap-2'>
+            <a href="https://www.linkedin.com/in/rayane-l-l-nogueira-1505391aa" target="_blank">
             <LinkedinLogoIcon size={48} weight='bold' />
-            <InstagramLogoIcon size={48} weight='bold' />
-            <FacebookLogoIcon size={48} weight='bold' />
-          </div>
+             </a>
 
+             <a href="https://www.instagram.com/rayane_l.l?igsh=MW9mcXAyeHJiMmM3eA==" target="_blank">
+              <InstagramLogoIcon size={48} weight='bold' />
+                </a>
+
+            <a href="https://www.facebook.com/share/1QEQuMVFAo/" target="_blank">
+            <FacebookLogoIcon size={48} weight='bold' />
+             </a>
+          </div>
         </div>
       </div>
     </>
