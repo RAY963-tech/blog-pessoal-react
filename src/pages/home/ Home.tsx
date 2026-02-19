@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import ImagemHomme from '../../assets/ImagemPáginaHome.svg';
+
 function Home() {
   return (
     <>
