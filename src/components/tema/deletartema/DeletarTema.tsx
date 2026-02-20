@@ -1,5 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { useState, useContext, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { ClipLoader } from "react-spinners";
@@ -12,6 +12,7 @@ function DeletarTema() {
 const navigate = useNavigate()
 
 const [tema, setTema] = useState<Tema>({} as Tema)
+
 const [isLoading, setIsLoading] = useState<boolean>(false)
 
 const { usuario, handleLogout } = useContext(AuthContext)
@@ -78,14 +79,13 @@ function retornar() {
     <div className='container w-1/3 mx-auto'>
       <h1 className='text-4xl text-center my-4'>Deletar tema</h1>
       <p className='text-center font-semibold mb-4'>
-        Você tem certeza de que deseja apagar o tema a seguir?
-      </p>
-
+        Você tem certeza de que deseja apagar o tema a seguir?</p>
       <div className='border flex flex-col rounded-2xl overflow-hidden justify-between'>
-        <header className='py-2 px-6 bg-indigo-600 text-white font-bold text-2xl'>
+        <header
+         className='py-2 px-6 bg-indigo-600 text-white font-bold text-2xl'>
           Tema
         </header>
-        <p className='p-8 text-3xl bg-slate-200 h-full'>tema</p>
+        
         <p className='p-8 text-3xl bg-slate-200 h-full'>{tema.descricao}</p>
         <div className="flex">
 
@@ -97,12 +97,12 @@ function retornar() {
 
           <button
             className='w-full text-slate-100 bg-indigo-400 hover:bg-indigo-600 flex items-center justify-center'
-            onClick={deletarTema}>
+            onClick={deletarTema}> 
             {isLoading ?
-            <ClipLoader 
-            color="#ffffff"
-            size={20}
-            /> :
+             <ClipLoader 
+             color="#ffffff"
+             size={24} 
+             /> :
             <span>Sim</span>}
           </button>
 
