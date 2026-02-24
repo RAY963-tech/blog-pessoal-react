@@ -1,4 +1,4 @@
-import type Postagem from "./ Postagem";
+import type Postagem from "./Postagem";
 
 
 export default interface Tema {

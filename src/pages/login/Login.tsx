@@ -1,10 +1,9 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import {
    useContext, 
    useEffect, 
    useState, 
    type ChangeEvent, 
-   type FormEvent 
+    type FormEvent 
   } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { ClipLoader } from "react-spinners";
@@ -91,6 +90,7 @@ function Login() {
             </Link>
           </p>
         </form>
+
 
         <div className="bg-[url('https://imgur.com/ZZFAmzo')] lg:block hidden bg-no-repeat w-full min-h-screen bg-cover bg-center">
         </div>
