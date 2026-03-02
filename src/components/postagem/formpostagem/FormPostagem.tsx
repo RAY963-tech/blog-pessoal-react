@@ -1,5 +1,3 @@
-/* eslint-disable react-hooks/set-state-in-effect */
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useContext, useEffect, type ChangeEvent } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { AuthContext } from "../../../contexts/AuthContext";
@@ -7,166 +5,147 @@ import type Postagem from "../../../models/Postagem";
 import type Tema from "../../../models/Tema";
 import { buscar, atualizar, cadastrar } from "../../../services/Service";
 import { ClipLoader } from "react-spinners";
-
+import { ToastAlerta } from "../../../utils/ToastAlerta";
 
 function FormPostagem() {
 
-const navigate = useNavigate()
+  const navigate = useNavigate();
+  const { id } = useParams<{ id: string }>();
 
-const [isLoading, setIsLoading] = useState<boolean>(false)
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [temas, setTemas] = useState<Tema[]>([]);
 
-const [temas, setTemas] = useState<Tema[]>([])
+  const [postagem, setPostagem] = useState<Postagem>({
+    id: 0,
+    titulo: '',
+    texto: '',
+    tema: null
+  } as Postagem);
 
-const [tema, setTema] = useState<Tema>({ 
-  id: 0, 
-  descricao: '',
-  postagem: null
-})
+  const { usuario, handleLogout } = useContext(AuthContext);
+  const token = usuario.token;
 
-const [postagem, setPostagem] = useState<Postagem>({} as Postagem)
 
-const { id } = useParams<{ id: string }>()
+  useEffect(() => {
+    if (token === '') {
+      ToastAlerta("Você precisa estar logado!", "info");
+      navigate('/');
+    }
+  }, [token, navigate]);
 
-const { usuario, handleLogout } = useContext(AuthContext)
-const token = usuario.token;
+  useEffect(() => {
 
-async function buscarPostagemPorId(id: string) {
-  try {
-    await buscar(`/postagens/${id}`, setPostagem, {
-      headers: { Authorization: token },
+    async function carregarDados() {
+
+      try {
+        await buscar('/temas', setTemas, {
+          headers: { Authorization: token }
+        });
+
+        if (id !== undefined) {
+          await buscar(`/postagens/${id}`, setPostagem, {
+            headers: { Authorization: token }
+          });
+        }
+
+      } catch (error: any) {
+        if (error.toString().includes('401')) {
+          handleLogout();
+        }
+      }
+    }
+
+    carregarDados();
+
+  }, [id, token, handleLogout]);
+
+ 
+  function atualizarEstado(e: ChangeEvent<HTMLInputElement>) {
+    setPostagem({
+      ...postagem,
+      [e.target.name]: e.target.value
     });
-  } catch (error: any) {
-    if (error.toString().includes('401')) {
-      handleLogout();
-    }
   }
-}
 
-async function buscarTemaPorId(id: string) {
-  try {
-    await buscar(`/temas/${id}`, setTema, {
-      headers: { Authorization: token }
-    })
-  } catch (error: any) {
-    if (error.toString().includes('401')) {
-      handleLogout();
-    }
-  }
-}
 
-async function buscarTemas() {
-  try {
-    await buscar(`/temas`, setTemas, {
-      headers: { Authorization: token },
+  function atualizarTema(e: ChangeEvent<HTMLSelectElement>) {
+
+    const temaSelecionado = temas.find(
+      (tema) => tema.id === Number(e.currentTarget.value)
+    );
+
+    setPostagem({
+      ...postagem,
+      tema: temaSelecionado!
     });
-  } catch (error: any) {
-    if (error.toString().includes('401')) {
-      handleLogout();
-    }
   }
-}
 
-useEffect(() => {
-  if (token === '') {
-    alert('Você precisa estar logado')
-    navigate('/')
+  function retornar() {
+    navigate('/postagens');
   }
-}, [token]);
 
-useEffect(() => {
-  buscarTemas()
+  async function gerarNovaPostagem(e: ChangeEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setIsLoading(true);
 
-  if (id !== undefined) {
-    buscarPostagemPorId(id)
-  }
-}, [id])
-
-useEffect(() => {
-  setPostagem({
-    ...postagem,
-    tema: tema,
-  });
-}, [tema]);
-
-function atualizarEstado(e: ChangeEvent<HTMLInputElement>) {
-  setPostagem({
-    ...postagem,
-    [e.target.name]: e.target.value,
-    
-  });
-}
-
-function retornar() {
-  navigate('/postagens');
-}
-
-async function gerarNovaPostagem(e: React.FormEvent<HTMLFormElement>) {
-  e.preventDefault();
-  setIsLoading(true);
-
-  if (id !== undefined) {
     try {
-      await atualizar(`/postagens`, postagem, setPostagem, {
-        headers: {
-          Authorization: token,
-        },
-      });
 
-      alert('Postagem atualizada com sucesso');
+      if (id !== undefined) {
+
+        await atualizar('/postagens', postagem, setPostagem, {
+          headers: { Authorization: token }
+        });
+
+        ToastAlerta("Postagem atualizada com sucesso!", "sucesso");
+
+      } else {
+
+        await cadastrar('/postagens', postagem, setPostagem, {
+          headers: { Authorization: token }
+        });
+
+        ToastAlerta("Postagem cadastrada com sucesso!", "sucesso");
+      }
+
+      retornar();
+
     } catch (error: any) {
+
       if (error.toString().includes('401')) {
         handleLogout();
       } else {
-        alert('Erro ao atualizar a Postagem');
+        ToastAlerta("Erro ao salvar a postagem.", "erro");
       }
-    }
-  } else {
-    try {
-      await cadastrar(`/postagens`, postagem, setPostagem, {
-        headers: {
-          Authorization: token,
-        },
-      });
 
-      alert('Postagem cadastrada com sucesso');
-    } catch (error: any) {
-      if (error.toString().includes('401')) {
-        handleLogout();
-      } else {
-        alert('Erro ao cadastrar a Postagem');
-      }
     }
+
+    setIsLoading(false);
   }
-
-  setIsLoading(false);
-  retornar();
-}
-
-const carregandoTema = tema.descricao === '';
-
 
   return (
     <div className="container flex flex-col mx-auto items-center justify-center">
+
       <h1 className="text-4xl text-center my-8">
         {id !== undefined ? 'Editar Postagem' : 'Cadastrar Postagem'}
       </h1>
 
       <form className="flex flex-col w-1/2 gap-4" onSubmit={gerarNovaPostagem}>
+
         <div className="flex flex-col gap-2">
-          <label htmlFor="titulo">Titulo da Postagem</label>
+          <label htmlFor="titulo">Título da Postagem</label>
           <input
             type="text"
-            placeholder="Titulo"
+            placeholder="Título"
             name="titulo"
             required
             className="border-2 border-slate-700 rounded p-2"
             value={postagem.titulo}
-            onChange={(e: ChangeEvent<HTMLInputElement>) => atualizarEstado(e)}
+            onChange={atualizarEstado}
           />
         </div>
 
         <div className="flex flex-col gap-2">
-          <label htmlFor="titulo">Texto da Postagem</label>
+          <label htmlFor="texto">Texto da Postagem</label>
           <input
             type="text"
             placeholder="Texto"
@@ -174,21 +153,27 @@ const carregandoTema = tema.descricao === '';
             required
             className="border-2 border-slate-700 rounded p-2"
             value={postagem.texto}
-            onChange={(e: ChangeEvent<HTMLInputElement>) => atualizarEstado(e)}
+            onChange={atualizarEstado}
           />
         </div>
 
         <div className="flex flex-col gap-2">
           <p>Tema da Postagem</p>
+
           <select
             name="tema"
-            id="tema"
             className="border p-2 border-slate-800 rounded"
-            onChange={(e) => buscarTemaPorId(e.currentTarget.value)}
+            value={postagem.tema?.id || ''}
+            onChange={atualizarTema}
           >
-            <option value="" selected disabled>Selecione um Tema</option>
-             {temas.map((tema) => (
-               <option key={tema.id} value={tema.id}>{tema.descricao}</option>
+            <option value="" disabled>
+              Selecione um Tema
+            </option>
+
+            {temas.map((tema) => (
+              <option key={tema.id} value={tema.id}>
+                {tema.descricao}
+              </option>
             ))}
 
           </select>
@@ -198,20 +183,20 @@ const carregandoTema = tema.descricao === '';
           type="submit"
           className="rounded disabled:bg-slate-200 bg-indigo-400 hover:bg-indigo-800
           text-white font-bold w-1/2 mx-auto py-2 flex justify-center"
-            disabled={carregandoTema || isLoading}
+          disabled={isLoading}
         >
-            {isLoading ? 
-                <ClipLoader
-                 color="#ffffff" 
-                size={24}
-                 /> :
-                    <span>{id !== undefined ? 'Atualizar Postagem' : 'Cadastrar Postagem'}</span>
-            }
-
+          {isLoading ? (
+            <ClipLoader color="#ffffff" size={24} />
+          ) : (
+            <span>
+              {id !== undefined ? 'Atualizar Postagem' : 'Cadastrar Postagem'}
+            </span>
+          )}
         </button>
+
       </form>
     </div>
-    );
+  );
 }
 
 export default FormPostagem;

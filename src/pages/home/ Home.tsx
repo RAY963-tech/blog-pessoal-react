@@ -1,5 +1,5 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import ImagemHomme from '../../assets/ImagemPáginaHome.svg';
+
 import ModalPostagem from '../../components/postagem/modelpostagem/ModelPostagem';
 
 function Home() {

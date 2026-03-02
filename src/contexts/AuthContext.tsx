@@ -1,8 +1,7 @@
-/* eslint-disable react-refresh/only-export-components */
-import { createContext, type ReactNode, useState } from "react";
-import type UsuarioLogin from "../models/UsuarioLogin";
-import { login } from "../services/Service";
-
+import { createContext, type ReactNode, useState } from "react"
+import type UsuarioLogin from "../models/UsuarioLogin"
+import { login } from "../services/Service"
+import { ToastAlerta } from "../utils/ToastAlerta"
 
 interface AuthContextProps {
     usuario: UsuarioLogin
@@ -15,7 +14,7 @@ interface AuthProviderProps {
     children: ReactNode
 }
 
-export const AuthContext = createContext<AuthContextProps>({} as AuthContextProps)
+export const AuthContext = createContext({} as AuthContextProps)
 
 export function AuthProvider({ children }: AuthProviderProps) {
 
@@ -28,34 +27,33 @@ export function AuthProvider({ children }: AuthProviderProps) {
         token: ""
     })
 
- const [isLoading, setIsLoading] = useState(false)
+    const [isLoading, setIsLoading] = useState(false)
 
-  async function handleLogin(usuarioLogin: UsuarioLogin) {
-    setIsLoading(true)
-    try {
-      await login('/usuarios/logar', usuarioLogin, setUsuario)
-      alert("O Usuário foi autenticado com sucesso!")
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    } catch (error) {
-      alert("Os Dados do usuário estão inconsistentes!")
+    async function handleLogin(usuarioLogin: UsuarioLogin) {
+        setIsLoading(true)
+        try {
+            await login(`/usuarios/logar`, usuarioLogin, setUsuario)
+            ToastAlerta("Usuário foi autenticado com sucesso!", "sucesso")
+        } catch {
+            ToastAlerta("Os dados do Usuário estão inconsistentes!", "erro")
+        }
+        setIsLoading(false)
     }
-    setIsLoading(false)
-  }
 
-  function handleLogout() {
-    setUsuario({
-      id: 0,
-      nome: "",
-      usuario: "",
-      senha: "",
-      foto: "",
-      token: ""
-    })
-  }
+    function handleLogout() {
+        setUsuario({
+            id: 0,
+            nome: "",
+            usuario: "",
+            senha: "",
+            foto: "",
+            token: ""
+        })
+    }
 
-  return (
-    <AuthContext.Provider value={{ usuario, handleLogin, handleLogout, isLoading }}>
-      {children}
-    </AuthContext.Provider>
-  )
+    return (
+        <AuthContext.Provider value={{ usuario, handleLogin, handleLogout, isLoading }}>
+            {children}
+        </AuthContext.Provider>
+    )
 }

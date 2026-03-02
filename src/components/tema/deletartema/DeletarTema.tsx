@@ -1,11 +1,11 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useContext, useEffect } from "react";
+
 import { useNavigate, useParams } from "react-router-dom";
 import { ClipLoader } from "react-spinners";
 import { AuthContext } from "../../../contexts/AuthContext";
 import type Tema from "../../../models/Tema";
 import { buscar, deletar } from "../../../services/Service";
+import { ToastAlerta } from "../../../utils/ToastAlerta";
 
 function DeletarTema() {
 
@@ -57,13 +57,13 @@ async function deletarTema() {
       }
     })
 
-    alert('Tema apagado com sucesso')
+    ToastAlerta("Tema apagado com sucesso", "sucesso")
 
   } catch (error: any) {
     if (error.toString().includes('401')) {
       handleLogout()
     } else {
-      alert('Erro ao deletar o tema.')
+      ToastAlerta("Erro ao deletar o tema.","erro")
     }
   }
 

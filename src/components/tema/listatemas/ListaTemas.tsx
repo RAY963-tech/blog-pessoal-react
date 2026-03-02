@@ -1,5 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable react-hooks/exhaustive-deps */
+
 import { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { SyncLoader } from "react-spinners";
@@ -7,6 +6,7 @@ import { AuthContext } from "../../../contexts/AuthContext";
 import type Tema from "../../../models/Tema";
 import { buscar } from "../../../services/Service";
 import CardTema from "../cardtema/CardTema";
+import { ToastAlerta } from "../../../utils/ToastAlerta";
 
 
 function ListaTemas() {
@@ -22,7 +22,7 @@ const token = usuario.token
 
 useEffect(() => {
   if (token === '') {
-    alert('Você precisa estar logado!')
+    ToastAlerta("Você precisa estar logado!", "info")
     navigate('/')
   }
 }, [token])
